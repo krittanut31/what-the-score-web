@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  addRally, canUndo, gameWinner, justChangedEnds, newMatch, serveInfo, startNextGame, summarize,
+  AUTO_SWAP_ENDS, addRally, canUndo, gameWinner, justChangedEnds, newMatch, serveInfo, startNextGame, summarize,
   teamAOnTop, undoRally, initial, type Config, type Match, type Side,
 } from './logic'
 
@@ -57,7 +57,7 @@ describe('singles serving', () => {
 
 describe('match flow', () => {
   const win = (t: Side) => Array<Side>(21).fill(t)
-  it('winner of a game serves first in the next and ends change', () => {
+  it.skipIf(!AUTO_SWAP_ENDS)('winner of a game serves first in the next and ends change', () => {
     let m = play(newMatch(), win(1))
     expect(summarize(doubles, m).current.winner).toBe(1)
     m = startNextGame(m)
@@ -73,7 +73,7 @@ describe('match flow', () => {
     expect(s.wins).toEqual([2, 1])
     expect(s.matchWinner).toBe(0)
   })
-  it('changes ends at 11 in the deciding game', () => {
+  it.skipIf(!AUTO_SWAP_ENDS)('changes ends at 11 in the deciding game', () => {
     let m = play(newMatch(), win(0))
     m = play(startNextGame(m), win(1))
     m = play(startNextGame(m), Array<Side>(10).fill(0))

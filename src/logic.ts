@@ -122,17 +122,21 @@ export function playerCourts(config: Config, g: GameState, team: Side): { player
   ]
 }
 
+/** Casual mode: set true to restore BWF automatic end changes (every game + interval in the decider). */
+export const AUTO_SWAP_ENDS = false
+
 const isDecider = (config: Config, index: number) => index === config.bestOf - 1
 
 /** True when team A should be drawn at the far (top) end of the court. */
 export function teamAOnTop(config: Config, match: Match, g: GameState): boolean {
-  let flipped = match.swapped !== (g.index % 2 === 1)
-  if (isDecider(config, g.index) && Math.max(...g.score) >= intervalAt(config.points)) flipped = !flipped
+  let flipped = match.swapped !== (AUTO_SWAP_ENDS && g.index % 2 === 1)
+  if (AUTO_SWAP_ENDS && isDecider(config, g.index) && Math.max(...g.score) >= intervalAt(config.points)) flipped = !flipped
   return !flipped
 }
 
 /** True when the last rally took the leading score to the interval in the deciding game. */
 export function justChangedEnds(config: Config, match: Match): boolean {
+  if (!AUTO_SWAP_ENDS) return false
   const i = match.games.length - 1
   const rallies = match.games[i]
   if (!isDecider(config, i) || rallies.length === 0) return false
